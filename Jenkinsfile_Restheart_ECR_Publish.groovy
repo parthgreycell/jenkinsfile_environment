@@ -143,10 +143,10 @@ docker push 566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-api-resthe
         // if so, push it to prod ecr as well, to avoid cross-tenant authorization pain
         sh """
 export AWS_PROFILE=bidclips-prod-ecr
-aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 875588116685.dkr.ecr.ap-southeast-1.amazonaws.com
-docker tag bidclips-api-restheart:${PUBLISHTAG} 875588116685.dkr.ecr.ap-southeast-1.amazonaws.com/bidclips-api-restheart:${PUBLISHTAG}
-docker push 875588116685.dkr.ecr.ap-southeast-1.amazonaws.com/bidclips-api-restheart:${PUBLISHTAG}
-docker image rmi -f 875588116685.dkr.ecr.ap-southeast-1.amazonaws.com/bidclips-api-restheart:${PUBLISHTAG}
+aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 566570633830.dkr.ecr.ap-southeast-1.amazonaws.com
+docker tag bidclips-api-restheart:${PUBLISHTAG} 566570633830.dkr.ecr.ap-southeast-1.amazonaws.com/bidclips-api-restheart:${PUBLISHTAG}
+docker push 566570633830.dkr.ecr.ap-southeast-1.amazonaws.com/bidclips-api-restheart:${PUBLISHTAG}
+docker image rmi -f 566570633830.dkr.ecr.ap-southeast-1.amazonaws.com/bidclips-api-restheart:${PUBLISHTAG}
         """
       }
     }
