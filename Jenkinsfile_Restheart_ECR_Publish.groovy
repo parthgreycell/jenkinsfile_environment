@@ -1,8 +1,6 @@
 node{
   try{
     properties([
-      buildDiscarder(logRotator(numToKeepStr: '10')),
-      disableConcurrentBuilds(abortPrevious: false),
       disableResume(),
       parameters([
         [$class: 'ListSubversionTagsParameterDefinition', credentialsId: 'munjal-gc-un-pw', defaultValue: '', maxTags: '', name: 'TagName', reverseByDate: true, reverseByName: false, tagsDir: 'https://github.com/BidClips/BidClips-API-Restheart.git', tagsFilter: '']
