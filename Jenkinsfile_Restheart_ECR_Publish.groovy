@@ -95,7 +95,7 @@ node{
           repoRegion = "ap-southeast-1"
 
         }
-      // }
+      }
 
       dir('BidClips-Infrastructure') {
         // Cloning Infra repo for configurations
@@ -182,5 +182,4 @@ docker image rmi -f 566570633830.dkr.ecr.ap-southeast-1.amazonaws.com/bidclips-a
       echo 'One way or another, I have finished'
     }
   }
-}
 }
