@@ -20,13 +20,13 @@ node("built-in"){
       }
       dir('BidClips-Web-Provider-Portal') {
         if (TagName.startsWith('tags')) {
-          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: 'refs/${TagName}']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com/BidClips/BidClips-Web-Provider-Portal.git']]]
+          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: 'refs/${TagName}']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-Web-Provider-Portal.git']]]
           PUBLISHTAG = TagName.split('/')[1]
           repoRegion = "ap-southeast-1"
         }
         if (TagName.startsWith('branches')) {
           def branch = TagName.split('/')[1]
-          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: branch]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com/BidClips/BidClips-Web-Provider-Portal.git']]]
+          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: branch]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-Web-Provider-Portal.git']]]
           PUBLISHTAG = sh(
             script: 'echo $(git log -1 --pretty=%h)',
             returnStdout: true
@@ -35,7 +35,7 @@ node("built-in"){
         }
         if (TagName.equals('trunk')) {
           TagName = 'branches/master'
-          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: 'master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com/BidClips/BidClips-Web-Provider-Portal.git']]]
+          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: 'master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:bidclips/bidclips-web-provider-portal.git']]]
           PUBLISHTAG = sh(
             script: 'echo $(git log -1 --pretty=%h)',
             returnStdout: true
@@ -55,7 +55,7 @@ npm install
 
       dir('BidClips-Infrastructure') {
         // Cloning Infra repo for configurations
-        checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: "master"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com/BidClips/BidClips-Web-Provider-Portal.git']]]
+        checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: "master"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-Web-Provider-Portal.git']]]
       }
     }
 
@@ -133,7 +133,7 @@ docker push 566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-service-st
     else if (currentBuild.result == 'FAILURE'){
       echo 'FAILURE!'
     }
-    else {
+    else { 
       echo 'One way or another, I have finished'
     }
   }
