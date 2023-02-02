@@ -65,26 +65,26 @@ node{
     def repoRegion = ""
 
     stage('Preparation'){
-      //  if (''.equals(TagName)){
-      //   echo "[FAILURE] TagName parameter is required - Failed to build, value provided : ${TagName}"
-      //   currentBuild.result = 'FAILURE'
-      //   throw new RuntimeException("required parameter missing : ${TagName}");
-      // }
-      // dir('BidClips-API-Restheart') {
-      //   if (TagName.startsWith('tags')) {
-      //     checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: 'refs/${TagName}']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-API-Restheart.git']]]
-      //     PUBLISHTAG = TagName.split('/')[1]
-      //     repoRegion = "ap-southeast-1"
-      //   }
-      //   if (TagName.startsWith('branches')) {
-      //     def branch = TagName.split('/')[1]
-      //     checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: branch]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-API-Restheart.git']]]
-      //     PUBLISHTAG = sh(
-      //       script: 'echo $(git log -1 --pretty=%h)',
-      //       returnStdout: true
-      //     ).trim()
-      //     repoRegion = "ap-southeast-1"
-      //   }
+       if (''.equals(TagName)){
+        echo "[FAILURE] TagName parameter is required - Failed to build, value provided : ${TagName}"
+        currentBuild.result = 'FAILURE'
+        throw new RuntimeException("required parameter missing : ${TagName}");
+      }
+      dir('BidClips-API-Restheart') {
+        if (TagName.startsWith('tags')) {
+          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: 'refs/${TagName}']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-API-Restheart.git']]]
+          PUBLISHTAG = TagName.split('/')[1]
+          repoRegion = "ap-southeast-1"
+        }
+        if (TagName.startsWith('branches')) {
+          def branch = TagName.split('/')[1]
+          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: branch]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-API-Restheart.git']]]
+          PUBLISHTAG = sh(
+            script: 'echo $(git log -1 --pretty=%h)',
+            returnStdout: true
+          ).trim()
+          repoRegion = "ap-southeast-1"
+        }
         if (TagName.equals('trunk')) {
           TagName = 'branches/master'
           checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: 'master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-API-Restheart.git']]]
@@ -182,4 +182,5 @@ docker image rmi -f 566570633830.dkr.ecr.ap-southeast-1.amazonaws.com/bidclips-a
       echo 'One way or another, I have finished'
     }
   }
+}
 }
