@@ -95,13 +95,14 @@ node{
           repoRegion = "ap-southeast-1"
 
         }
-      }
+      // }
 
       dir('BidClips-Infrastructure') {
         // Cloning Infra repo for configurations
         checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: "master"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-Infrastructure.git']]]
       }
     }
+  
     stage('Building Binaries'){
       dir('BidClips-Infrastructure') {
         sh """
