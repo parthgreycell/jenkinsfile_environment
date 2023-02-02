@@ -58,9 +58,9 @@ node{
       disableConcurrentBuilds(abortPrevious: false),
       disableResume(),
       parameters([
-        [$class: 'ListSubversionTagsParameterDefinition', credentialsId: 'munjal-gc-un-pw', defaultValue: 'kjhkj', maxTags: '', name: 'TagName', reverseByDate: true, reverseByName: false, tagsDir: 'https://github.com/BidClips/BidClips-Mainstreet-API.git', tagsFilter: ''],
-
-        [$class: 'ListSubversionTagsParameterDefinition', credentialsId: 'munjal-gc-un-pw', defaultValue: 'kjhkj', maxTags: '', name: 'TagName', reverseByDate: true, reverseByName: false, tagsDir: 'https://github.com/BidClips/BidClips-Mainstreet-API.git', tagsFilter: '']
+        // choice(choices: ['dev', 'qa', 'uat', 'prod'], description: '', name: 'BuildProfile'),
+        choice(choices: ['dev'], description: '', name: 'BuildProfile'),
+        [$class: 'ListSubversionTagsParameterDefinition', credentialsId: 'munjal-gc-un-pw', defaultValue: '', maxTags: '', name: 'TagName', reverseByDate: true, reverseByName: false, tagsDir: 'https://github.com/BidClips/BidClips-QuickBook-API.git', tagsFilter: '']
       ])
     ])
     def PUBLISHTAG = ""
@@ -72,15 +72,15 @@ node{
         currentBuild.result = 'FAILURE'
         throw new RuntimeException("required parameter missing : ${TagName}");
       }
-      dir('BidClips-Mainstreet-API') {
+      dir('BidClips-QuickBook-API') {
         if (TagName.startsWith('tags')) {
-          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: 'refs/${TagName}']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-Mainstreet-API.git']]]
+          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: 'refs/${TagName}']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-QuickBook-API.git']]]
           PUBLISHTAG = TagName.split('/')[1]
           repoRegion = "ap-southeast-1"
         }
         if (TagName.startsWith('branches')) {
           def branch = TagName.split('/')[1]
-          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: branch]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-Mainstreet-API.git']]]
+          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: branch]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-QuickBook-API.git']]]
           PUBLISHTAG = sh(
             script: 'echo $(git log -1 --pretty=%h)',
             returnStdout: true
@@ -89,51 +89,50 @@ node{
         }
         if (TagName.equals('trunk')) {
           TagName = 'branches/master'
-          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: 'master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-Mainstreet-API.git']]]
+          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: 'master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-QuickBook-API.git']]]
           PUBLISHTAG = sh(
             script: 'echo $(git log -1 --pretty=%h)',
             returnStdout: true
           ).trim()
           repoRegion = "ap-southeast-1"
+
         }
       }
-
-      dir('BidClips-Infrastructure') {
-        // Cloning Infra repo for configurations
-        checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: "master"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-Infrastructure.git']]]
-      }
     }
+
     stage('Building Docker Image'){
-      dir('BidClips-Mainstreet-API') {
+      dir('BidClips-QuickBook-API') {
+        def BUILDENV = ""
+        if(BuildProfile=="dev"){
+          BUILDENV="dev"
+        } else {
+          BUILDENV="prod"
+        }
         sh """
-        rm src/main/resources/logback-spring.xml
-        cp ../BidClips-Infrastructure/common/BidClips-Mainstreet-API/logback.xml src/main/resources/logback-spring.xml
-        sudo update-alternatives --set java /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.282.b08-1.amzn2.0.1.x86_64/jre/bin/java
-        sudo update-alternatives --set javac /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.282.b08-1.amzn2.0.1.x86_64/bin/javac
-        ./gradlew bootJar -Pprod jibDockerBuild
+        echo "Build Profile : ${BUILDENV}"
         sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-11.0.11.0.9-1.amzn2.0.1.x86_64/bin/java
         sudo update-alternatives --set javac /usr/lib/jvm/java-11-openjdk-11.0.11.0.9-1.amzn2.0.1.x86_64/bin/javac
+        ./gradlew bootJar -P${BUILDENV} jibDockerBuild
+        sudo update-alternatives --set java /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.282.b08-1.amzn2.0.1.x86_64/jre/bin/java
+        sudo update-alternatives --set javac /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.282.b08-1.amzn2.0.1.x86_64/bin/javac
+        docker images | grep bidclipsquickbookapi
         """
       }
     }
-
     stage("Publishing ${PUBLISHTAG}"){
       sh """
 export AWS_PROFILE=bidclips-eks
 aws ecr get-login-password --region ${repoRegion} | docker login --username AWS --password-stdin 566570633830.dkr.ecr.${repoRegion}.amazonaws.com
-docker tag bidclipsmainstreetapi 566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-mainstreet-api:${PUBLISHTAG}
-docker push 566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-mainstreet-api:${PUBLISHTAG}
+docker tag bidclipsquickbookapi:latest 566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-quickbook-api:${PUBLISHTAG}
+docker push 566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-quickbook-api:${PUBLISHTAG}
         """
     }
     stage('Cleanup'){
       sh """
-      docker image rmi -f bidclipsmainstreetapi
-      docker image rmi -f 566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-mainstreet-api:${PUBLISHTAG}
+      docker image rmi -f bidclipsquickbookapi:latest
+      docker image rmi -f 566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-quickbook-api:${PUBLISHTAG}
       """
-      dir('BidClips-Infrastructure') {
-        deleteDir()
-      }
-      dir('BidClips-Mainstreet-API') {
+      dir('BidClips-QuickBook-API') {
         deleteDir()
       }
     }
