@@ -133,12 +133,12 @@ node{
       }
     }
     stage("Publishing ${PUBLISHTAG}"){
-      sh """
-export AWS_PROFILE=bidclips-eks
-aws ecr get-login-password --region ${repoRegion} | docker login --username AWS --password-stdin 566570633830.dkr.ecr.${repoRegion}.amazonaws.com
-docker tag bidclips-api-restheart:${PUBLISHTAG} 566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-api-restheart:${PUBLISHTAG}
-docker push 566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-api-restheart:${PUBLISHTAG}
-        """
+//       sh """
+// export AWS_PROFILE=bidclips-eks
+// aws ecr get-login-password --region ${repoRegion} | docker login --username AWS --password-stdin 566570633830.dkr.ecr.${repoRegion}.amazonaws.com
+// docker tag bidclips-api-restheart:${PUBLISHTAG} 566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-api-restheart:${PUBLISHTAG}
+// docker push 566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-api-restheart:${PUBLISHTAG}
+//         """
       if(repoRegion == "ap-southeast-1"){
         // us-east-1 means docker image built from tag; not branch
         // if so, push it to prod ecr as well, to avoid cross-tenant authorization pain
