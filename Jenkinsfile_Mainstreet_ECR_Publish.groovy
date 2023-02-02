@@ -58,9 +58,7 @@ node{
       disableConcurrentBuilds(abortPrevious: false),
       disableResume(),
       parameters([
-        [$class: 'ListSubversionTagsParameterDefinition', credentialsId: 'munjal-gc-un-pw', defaultValue: 'kjhkj', maxTags: '', name: 'TagName', reverseByDate: true, reverseByName: false, tagsDir: 'https://github.com/BidClips/BidClips-Mainstreet-API.git', tagsFilter: ''],
-
-        [$class: 'ListSubversionTagsParameterDefinition', credentialsId: 'munjal-gc-un-pw', defaultValue: 'kjhkj', maxTags: '', name: 'TagName', reverseByDate: true, reverseByName: false, tagsDir: 'https://github.com/BidClips/BidClips-Mainstreet-API.git', tagsFilter: '']
+        [$class: 'ListSubversionTagsParameterDefinition', credentialsId: 'munjal-gc-un-pw', defaultValue: '', maxTags: '', name: 'TagName', reverseByDate: true, reverseByName: false, tagsDir: 'https://github.com/BidClips/BidClips-Mainstreet-API.git', tagsFilter: '']
       ])
     ])
     def PUBLISHTAG = ""
