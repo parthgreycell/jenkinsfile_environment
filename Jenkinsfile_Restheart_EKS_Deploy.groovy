@@ -125,7 +125,7 @@ sed -i 's#REPLACEME_V2_QUEUE#$real_awssqs_v2_queue_id#g' common/BidClips-API-Res
 sed -i 's#REPLACEME_IDM_SECRET#$real_bidclips_idm_id#g' common/BidClips-API-Restheart/etc/restheart.yml
 cd common/BidClips-API-Restheart/
 tar -czf restheart-conf.tar.gz etc/
-scp restheart-conf.tar.gz appuser@${bootstrapper.get(DeployEnv)}:/home/appuser/restheart-conf.tar.gz
+scp restheart-conf.tar.gz ec2-user@18.141.143.199:/home/ec2-user/restheart-conf.tar.gz
 rm restheart-conf.tar.gz
               """
         }
@@ -135,25 +135,25 @@ rm restheart-conf.tar.gz
         sh """
 cd BidClips-EKS/Kubernetes/application-stack/
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#$dockerImageWithTag#g' restheart.yaml
-scp restheart.yaml appuser@${bootstrapper.get(DeployEnv)}:/home/appuser/restheart.yaml
+scp restheart.yaml ec2-user@18.141.143.199:/home/appuser/restheart.yaml
         """
       }
     }
 
     stage("Deploying ${DEPLOYTAG}"){
       sh """
-ssh -tt appuser@${bootstrapper.get(DeployEnv)} /bin/bash << EOA
+ssh -tt ec2-user@18.141.143.199 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lh restheart.*
 tar -xzf restheart-conf.tar.gz
 rm restheart-conf.tar.gz
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config -n app-stack delete configmap restheart-config
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config -n app-stack create configmap restheart-config --from-file=etc/
+kubectl --kubeconfig=/home/ec2-user/.kube/bidclips_${DeployEnv}_config -n app-stack delete configmap restheart-config
+kubectl --kubeconfig=/home/ec2-user/.kube/bidclips_${DeployEnv}_config -n app-stack create configmap restheart-config --from-file=etc/
 sleep 5;
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config apply -f restheart.yaml
+kubectl --kubeconfig=/home/ec2-user/.kube/bidclips_${DeployEnv}_config apply -f restheart.yaml
 rm restheart.*
 sleep 5;
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config -n app-stack get deploy | grep restheart
+kubectl --kubeconfig=/home/ec2-user/.kube/bidclips_${DeployEnv}_config -n app-stack get deploy | grep restheart
 exit
 EOA
       """
