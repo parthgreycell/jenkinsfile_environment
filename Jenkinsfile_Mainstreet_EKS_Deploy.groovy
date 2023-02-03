@@ -100,30 +100,25 @@ node("built-in"){
         }
       }
 
-      if(DeployEnv == "prod"){
-        dockerImageWithTag="875588116685.dkr.ecr.us-east-1.amazonaws.com/bidclips-mainstreet-api:${DEPLOYTAG}".replace(':','\\:')
-      }
-      else{
-        dockerImageWithTag="566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-mainstreet-api:${DEPLOYTAG}".replace(':','\\:')
-      }
+      
       def mainstreet_secret_id = ''
       def mongo_uri_id = ''
       if (DeployEnv == 'dev') {
         mainstreet_secret_id = "98196e50-0432-44f4-b3e6-1daf173f67dd"
         mongo_uri_id = "b8dbbe2f-0fc8-4430-8cda-8297d8ca7311"
       }
-      if (DeployEnv == 'qa') {
-        mainstreet_secret_id = "b6846b83-692b-4d70-9f2d-4db4580934db"
-        mongo_uri_id = "f10fbbfd-abc8-48a0-a141-3b158c916337"
-      }
-      if (DeployEnv == 'uat') {
-        mainstreet_secret_id = "d556ffcb-37d5-4220-b704-5366d1a9c983"
-        mongo_uri_id = "9b997d18-933e-4341-aab6-0fc1af510342"
-      }
-      if (DeployEnv == 'prod') {
-        mainstreet_secret_id = "8434a4d7-98a0-4557-ad1d-ca26b0ed0517"
-        mongo_uri_id = "80d5f5d3-a497-4253-9a92-8f8f064344e2"
-      }
+      // if (DeployEnv == 'qa') {
+      //   mainstreet_secret_id = "b6846b83-692b-4d70-9f2d-4db4580934db"
+      //   mongo_uri_id = "f10fbbfd-abc8-48a0-a141-3b158c916337"
+      // }
+      // if (DeployEnv == 'uat') {
+      //   mainstreet_secret_id = "d556ffcb-37d5-4220-b704-5366d1a9c983"
+      //   mongo_uri_id = "9b997d18-933e-4341-aab6-0fc1af510342"
+      // }
+      // if (DeployEnv == 'prod') {
+      //   mainstreet_secret_id = "8434a4d7-98a0-4557-ad1d-ca26b0ed0517"
+      //   mongo_uri_id = "80d5f5d3-a497-4253-9a92-8f8f064344e2"
+      // }
       dir('BidClips-Infrastructure'){
           checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: 'master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-Infrastructure.git']]]
           withCredentials([
@@ -136,20 +131,20 @@ cd BidClips-EKS/Kubernetes/application-stack/
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#$dockerImageWithTag#g' mainstreet.yaml
 sed -i 's#REPLACEME_MONGODB_URI#$mongoURI#g' mainstreet.yaml
 sed -i 's#REPLACEME_JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET#$mainstreet_secret#g' mainstreet.yaml
-scp mainstreet.yaml appuser@${bootstrapper.get(DeployEnv)}:/home/appuser/mainstreet.yaml
+scp mainstreet.yaml ec2-user@18.141.143.199:/home/ec2-user/mainstreet.yaml
             """
           }
       }
     }
     stage("Deploying ${DEPLOYTAG}"){
       sh """
-ssh -tt appuser@${bootstrapper.get(DeployEnv)} /bin/bash << EOA
+ssh -tt ec2-user@18.141.143.199 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lh mainstreet.yaml
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config apply -f mainstreet.yaml
+kubectl  apply -f mainstreet.yaml
 rm mainstreet.yaml
 sleep 5;
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config -n app-stack get deploy | grep mainstreet
+kubectl  -n app-stack get deploy | grep mainstreet
 exit
 EOA
       """
