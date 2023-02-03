@@ -165,14 +165,14 @@ export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lh quickbook*
 tar -xzf /home/ec2-user/quickbook-config.tar.gz
 rm quickbook-config.tar.gz
-kubectl  -n app-stack delete configmap quickbook-config
-kubectl  -n app-stack create configmap quickbook-config --from-file=quickbook-config/
+kubectl -n app-stack delete configmap quickbook-config
+kubectl -n app-stack create configmap quickbook-config --from-file=quickbook-config/
 sleep 5;
 rm -rf quickbook-config/
 kubectl  apply -f quickbook.yaml
 rm quickbook*
 sleep 5;
-kubectl  -n app-stack get deploy | grep quickbook
+kubectl -n app-stack get deploy | grep quickbook
 exit
 EOA
       """
