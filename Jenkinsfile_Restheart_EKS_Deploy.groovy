@@ -147,13 +147,13 @@ export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lh restheart.*
 tar -xzf restheart-conf.tar.gz
 rm restheart-conf.tar.gz
-kubectl --kubeconfig=/home/ec2-user/.kube/bidclips_${DeployEnv}_config -n app-stack delete configmap restheart-config
-kubectl --kubeconfig=/home/ec2-user/.kube/bidclips_${DeployEnv}_config -n app-stack create configmap restheart-config --from-file=etc/
+kubectl  -n app-stack delete configmap restheart-config
+kubectl  -n app-stack create configmap restheart-config --from-file=etc/
 sleep 5;
-kubectl --kubeconfig=/home/ec2-user/.kube/bidclips_${DeployEnv}_config apply -f restheart.yaml
+kubectl  apply -f restheart.yaml
 rm restheart.*
 sleep 5;
-kubectl --kubeconfig=/home/ec2-user/.kube/bidclips_${DeployEnv}_config -n app-stack get deploy | grep restheart
+kubectl  -n app-stack get deploy | grep restheart
 exit
 EOA
       """
