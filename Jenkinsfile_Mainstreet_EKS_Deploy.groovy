@@ -146,6 +146,7 @@ ls -lah
 aws eks update-kubeconfig --name bidclips-parth
 ls -lh mainstreet.yaml
 pwd
+cat mainstreet.yaml
 kubectl apply -f mainstreet.yaml
 rm mainstreet.yaml
 sleep 5;
