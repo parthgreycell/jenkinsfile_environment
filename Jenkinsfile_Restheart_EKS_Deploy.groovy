@@ -135,7 +135,7 @@ rm restheart-conf.tar.gz
         sh """
 cd BidClips-EKS/Kubernetes/application-stack/
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#$dockerImageWithTag#g' restheart.yaml
-scp restheart.yaml ec2-user@18.141.143.199:/home/appuser/restheart.yaml
+scp restheart.yaml ec2-user@18.141.143.199:/home/ec2-user/restheart.yaml
         """
       }
     }
