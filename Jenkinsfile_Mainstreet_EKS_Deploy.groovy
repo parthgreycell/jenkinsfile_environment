@@ -64,7 +64,7 @@ node("built-in"){
     ])
     def DEPLOYTAG = ""
     def repoRegion = ""
-    def dockerImageWithTag = ""
+    def dockerImageWithTag = "4b5897a"
     def bootstrapper = [
       "dev": "18.141.143.199",
       "qa": "18.141.143.199",
@@ -129,9 +129,6 @@ node("built-in"){
             sh """
 cd BidClips-EKS/Kubernetes/application-stack/
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#$dockerImageWithTag#g' mainstreet.yaml
-echo  888888888888888888888888888888888888
-echo "$dockerImageWithTag"
-echo  888888888888888888888888888888888888
 sed -i 's#REPLACEME_MONGODB_URI#$mongoURI#g' mainstreet.yaml
 sed -i 's#REPLACEME_JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET#$mainstreet_secret#g' mainstreet.yaml
 ls
