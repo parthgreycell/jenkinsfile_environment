@@ -143,7 +143,7 @@ scp mainstreet.yaml ec2-user@18.141.143.199:/home/ec2-user/mainstreet.yaml
 ssh -tt ec2-user@18.141.143.199 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lah
-aws eks update-kubeconfig --name example
+aws eks update-kubeconfig --name bidclips-parth
 ls -lh mainstreet.yaml
 pwd
 kubectl apply -f mainstreet.yaml
