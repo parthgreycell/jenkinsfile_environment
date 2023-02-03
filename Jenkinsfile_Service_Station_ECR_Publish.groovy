@@ -111,7 +111,7 @@ docker push 566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-service-st
       docker image rmi -f bidclips-web-provider-portal:${PUBLISHTAG}
       """
       // docker image rmi -f 566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-service-station:${PUBLISHTAG}
-      dir('BidClips-Infrastructure') {}
+      dir('BidClips-Infrastructure') {
         deleteDir()
       }
       dir('BidClips-Web-Provider-Portal') {
