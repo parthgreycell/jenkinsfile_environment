@@ -131,6 +131,8 @@ cd BidClips-EKS/Kubernetes/application-stack/
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#$dockerImageWithTag#g' mainstreet.yaml
 sed -i 's#REPLACEME_MONGODB_URI#$mongoURI#g' mainstreet.yaml
 sed -i 's#REPLACEME_JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET#$mainstreet_secret#g' mainstreet.yaml
+ls
+pwd
 scp mainstreet.yaml ec2-user@18.141.143.199:/home/ec2-user/mainstreet.yaml
             """
           }
@@ -142,10 +144,11 @@ ssh -tt ec2-user@18.141.143.199 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lah
 ls -lh mainstreet.yaml
-kubectl  apply -f mainstreet.yaml
+pwd
+kubectl apply -f mainstreet.yaml
 rm mainstreet.yaml
 sleep 5;
-kubectl  -n app-stack get deploy | grep mainstreet
+kubectl -n app-stack get deploy | grep mainstreet
 exit
 EOA
       """
