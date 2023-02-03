@@ -140,6 +140,7 @@ scp mainstreet.yaml ec2-user@18.141.143.199:/home/ec2-user/mainstreet.yaml
       sh """
 ssh -tt ec2-user@18.141.143.199 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
+ls -lah
 ls -lh mainstreet.yaml
 kubectl  apply -f mainstreet.yaml
 rm mainstreet.yaml
