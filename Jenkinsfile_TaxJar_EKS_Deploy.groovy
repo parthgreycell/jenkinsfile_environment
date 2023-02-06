@@ -65,10 +65,10 @@ node("built-in"){
     def DEPLOYTAG = ""
     def repoRegion = ""
     def bootstrapper = [
-      "dev": "18.141.143.199",
-      "qa": "18.141.143.199",
-      "uat": "18.141.143.199",
-      "prod": "18.141.143.199"
+      "dev": "18.140.71.163",
+      "qa": "18.140.71.163",
+      "uat": "18.140.71.163",
+      "prod": "18.140.71.163"
     ]
     def DOMAIN = ""
     def dockerImageWithTag = ""
@@ -117,28 +117,28 @@ node("built-in"){
             mongo_uri = "fa0513f2-3763-4c81-ac42-fb1945efbd2a"
             restheart_url = "7a3edf37-bb4a-4a95-9f08-02f662762e02"
           }
-          if(DeployEnv=="qa"){
-            taxjar_api_key = "9746ef40-e353-46e6-841f-c36309a99ec8"
-            taxjar_path = "e8e70e6c-9dd2-434d-be12-ad74cad44f95"
-            base64_secret = "49fe8b37-ac9c-4723-8e88-8833fffc52fe"
-            // above credentials are of dev env
-            mongo_uri = "c30e77e1-8741-452f-ba58-f4d0724eb1c4"
-            restheart_url = "d7c6eeed-22ae-49ca-ad39-a1f4a36ca096"
-          }
-          if(DeployEnv=="uat"){
-            taxjar_api_key = "9746ef40-e353-46e6-841f-c36309a99ec8"
-            taxjar_path = "e8e70e6c-9dd2-434d-be12-ad74cad44f95"
-            mongo_uri = "2311be07-35c4-4296-ba5b-a11e637e1787"
-            restheart_url = "3c287199-5a6f-4759-b4cb-43cbc0dd0a2c"
-            base64_secret = "6852d2ad-9d2e-45ef-8df4-74a9e75db153"
-          }
-          if(DeployEnv=="prod"){
-            taxjar_api_key = "9746ef40-e353-46e6-841f-c36309a99ec8"
-            taxjar_path = "e8e70e6c-9dd2-434d-be12-ad74cad44f95"
-            mongo_uri = "e1af3291-3e80-49c8-b5d0-77cd8cb6119c"
-            restheart_url = "c0d52f8d-bf6e-418b-93e2-6d1048130843"
-            base64_secret = "0e3deb42-4fc5-4d1b-b6bd-91019debae9e"
-          }
+          // if(DeployEnv=="qa"){
+          //   taxjar_api_key = "9746ef40-e353-46e6-841f-c36309a99ec8"
+          //   taxjar_path = "e8e70e6c-9dd2-434d-be12-ad74cad44f95"
+          //   base64_secret = "49fe8b37-ac9c-4723-8e88-8833fffc52fe"
+          //   // above credentials are of dev env
+          //   mongo_uri = "c30e77e1-8741-452f-ba58-f4d0724eb1c4"
+          //   restheart_url = "d7c6eeed-22ae-49ca-ad39-a1f4a36ca096"
+          // }
+          // if(DeployEnv=="uat"){
+          //   taxjar_api_key = "9746ef40-e353-46e6-841f-c36309a99ec8"
+          //   taxjar_path = "e8e70e6c-9dd2-434d-be12-ad74cad44f95"
+          //   mongo_uri = "2311be07-35c4-4296-ba5b-a11e637e1787"
+          //   restheart_url = "3c287199-5a6f-4759-b4cb-43cbc0dd0a2c"
+          //   base64_secret = "6852d2ad-9d2e-45ef-8df4-74a9e75db153"
+          // }
+          // if(DeployEnv=="prod"){
+          //   taxjar_api_key = "9746ef40-e353-46e6-841f-c36309a99ec8"
+          //   taxjar_path = "e8e70e6c-9dd2-434d-be12-ad74cad44f95"
+          //   mongo_uri = "e1af3291-3e80-49c8-b5d0-77cd8cb6119c"
+          //   restheart_url = "c0d52f8d-bf6e-418b-93e2-6d1048130843"
+          //   base64_secret = "0e3deb42-4fc5-4d1b-b6bd-91019debae9e"
+          // }
           withCredentials([
             string(credentialsId: taxjar_api_key, variable: 'var_taxjar_api_key'),
             string(credentialsId: taxjar_path, variable: 'var_taxjar_path'),
@@ -161,7 +161,7 @@ cp src/main/resources/config/application-prod.yml taxjar-config/
 cp taxjar-config/application-prod.yml taxjar-config/application-dev.yml
 tar -czf taxjar-config.tar.gz taxjar-config/
 rm -rf taxjar-config/
-scp taxjar-config.tar.gz appuser@${bootstrapper.get(DeployEnv)}:/home/appuser/taxjar-config.tar.gz
+scp taxjar-config.tar.gz ec2-user@18.140.71.163:/home/ec2-user/taxjar-config.tar.gz
 rm taxjar-config.tar.gz
                 """
             }
@@ -179,26 +179,26 @@ rm taxjar-config.tar.gz
         }
         sh """
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#$dockerImageWithTag#g' BidClips-EKS/Kubernetes/application-stack/taxjar.yaml
-scp BidClips-EKS/Kubernetes/application-stack/taxjar.yaml appuser@${bootstrapper.get(DeployEnv)}:/home/appuser/taxjar.yaml
+scp BidClips-EKS/Kubernetes/application-stack/taxjar.yaml ec2-user@18.140.71.163:/home/ec2-user/taxjar.yaml
         """
       }
     }
 
     stage("Deploying ${DEPLOYTAG}"){
       sh """
-ssh -tt appuser@${bootstrapper.get(DeployEnv)} /bin/bash << EOA
+ssh -tt ec2-user@18.140.71.163 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lh taxjar*
 tar -xzf taxjar-config.tar.gz
 rm taxjar-config.tar.gz
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config -n app-stack delete configmap taxjar-config
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config -n app-stack create configmap taxjar-config --from-file=taxjar-config/
+kubectl -n app-stack delete configmap taxjar-config
+kubectl -n app-stack create configmap taxjar-config --from-file=taxjar-config/
 sleep 5;
 rm -rf taxjar-config/
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config apply -f taxjar.yaml
+kubectl apply -f taxjar.yaml
 rm taxjar*
 sleep 5;
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config -n app-stack get deploy | grep taxjar
+kubectl -n app-stack get deploy | grep taxjar
 exit
 EOA
       """
