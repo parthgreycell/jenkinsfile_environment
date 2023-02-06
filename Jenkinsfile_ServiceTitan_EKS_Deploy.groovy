@@ -18,10 +18,10 @@ node("built-in"){
     def DEPLOYTAG = ""
     def repoRegion = ""
     def bootstrapper = [
-      "dev": "18.141.143.199",
-      "qa": "18.141.143.199",
-      "uat": "18.141.143.199",
-      "prod": "18.141.143.199"
+      "dev": "18.140.71.163",
+      "qa": "18.140.71.163",
+      "uat": "18.140.71.163",
+      "prod": "18.140.71.163"
     ]
     def DOMAIN = ""
     def dockerImageWithTag = ""
@@ -67,24 +67,24 @@ node("built-in"){
           base64_secret = "7d577f14-79f4-49fd-80b6-eddc68b92a88"
           servicetitan_authentication_url = "a71fec99-364f-4326-8fe5-801a3ce7fb46"
         }
-        if(DeployEnv=="qa"){
-          // env creds here
-          mongodb_connection_url = "c30e77e1-8741-452f-ba58-f4d0724eb1c4"
-          base64_secret = "49fe8b37-ac9c-4723-8e88-8833fffc52fe"
-          servicetitan_authentication_url = "a71fec99-364f-4326-8fe5-801a3ce7fb46"
-        }
-        if(DeployEnv=="uat"){
-          // env creds here
-          mongodb_connection_url = "2311be07-35c4-4296-ba5b-a11e637e1787"
-          base64_secret = "6852d2ad-9d2e-45ef-8df4-74a9e75db153"
-          servicetitan_authentication_url = "a71fec99-364f-4326-8fe5-801a3ce7fb46"
-        }
-        if(DeployEnv=="prod"){
-          // env creds here
-          mongodb_connection_url = "e1af3291-3e80-49c8-b5d0-77cd8cb6119c"
-          base64_secret = "0e3deb42-4fc5-4d1b-b6bd-91019debae9e"
-          servicetitan_authentication_url = "56b5dd66-e63c-439c-bcf7-19b130e468c1"
-        }
+        // if(DeployEnv=="qa"){
+        //   // env creds here
+        //   mongodb_connection_url = "c30e77e1-8741-452f-ba58-f4d0724eb1c4"
+        //   base64_secret = "49fe8b37-ac9c-4723-8e88-8833fffc52fe"
+        //   servicetitan_authentication_url = "a71fec99-364f-4326-8fe5-801a3ce7fb46"
+        // }
+        // if(DeployEnv=="uat"){
+        //   // env creds here
+        //   mongodb_connection_url = "2311be07-35c4-4296-ba5b-a11e637e1787"
+        //   base64_secret = "6852d2ad-9d2e-45ef-8df4-74a9e75db153"
+        //   servicetitan_authentication_url = "a71fec99-364f-4326-8fe5-801a3ce7fb46"
+        // }
+        // if(DeployEnv=="prod"){
+        //   // env creds here
+        //   mongodb_connection_url = "e1af3291-3e80-49c8-b5d0-77cd8cb6119c"
+        //   base64_secret = "0e3deb42-4fc5-4d1b-b6bd-91019debae9e"
+        //   servicetitan_authentication_url = "56b5dd66-e63c-439c-bcf7-19b130e468c1"
+        // }
         withCredentials([
           string(credentialsId: mongodb_connection_url, variable: 'var_mongodb_connection_url'),
           string(credentialsId: base64_secret, variable: 'var_base64_secret'),
@@ -104,7 +104,7 @@ cp src/main/resources/config/application-prod.yml servicetitan-config/
 cp servicetitan-config/application-prod.yml servicetitan-config/application-dev.yml
 tar -czf servicetitan-config.tar.gz servicetitan-config/
 rm -rf servicetitan-config/
-scp servicetitan-config.tar.gz appuser@${bootstrapper.get(DeployEnv)}:/home/appuser/servicetitan-config.tar.gz
+scp servicetitan-config.tar.gz ec2-user@18.140.71.163:/home/ec2-user/servicetitan-config.tar.gz
 rm servicetitan-config.tar.gz
           """
         }
@@ -122,26 +122,26 @@ rm servicetitan-config.tar.gz
         sh """
 cd BidClips-EKS/Kubernetes/application-stack/
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#$dockerImageWithTag#g' servicetitan.yaml
-scp servicetitan.yaml appuser@${bootstrapper.get(DeployEnv)}:/home/appuser/servicetitan.yaml
+scp servicetitan.yaml ec2-user@18.140.71.163:/home/ec2-user/servicetitan.yaml
         """
       }
     }
 
     stage("Deploying ${DEPLOYTAG}"){
       sh """
-ssh -tt appuser@${bootstrapper.get(DeployEnv)} /bin/bash << EOA
+ssh -tt ec2-user@18.140.71.163 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lh servicetitan*
-tar -xzf /home/appuser/servicetitan-config.tar.gz
+tar -xzf /home/ec2-user/servicetitan-config.tar.gz
 rm servicetitan-config.tar.gz
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config -n app-stack delete configmap servicetitan-config
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config -n app-stack create configmap servicetitan-config --from-file=servicetitan-config/
+kubectl -n app-stack delete configmap servicetitan-config
+kubectl -n app-stack create configmap servicetitan-config --from-file=servicetitan-config/
 sleep 5;
 rm -rf servicetitan-config/
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config apply -f servicetitan.yaml
+kubectl apply -f servicetitan.yaml
 rm servicetitan*
 sleep 5;
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config -n app-stack get deploy | grep servicetitan
+kubectl -n app-stack get deploy | grep servicetitan
 exit
 EOA
       """
