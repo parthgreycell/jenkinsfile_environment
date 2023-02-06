@@ -12,10 +12,10 @@ node("built-in"){
     def DEPLOYTAG = ""
     def repoRegion = ""
     def bootstrapper = [
-      "dev": "18.141.143.199",
-      "qa": "18.141.143.199",
-      "uat": "18.141.143.199",
-      "prod": "18.141.143.199"
+      "dev": "18.140.71.163",
+      "qa": "18.140.71.163",
+      "uat": "18.140.71.163",
+      "prod": "18.140.71.163"
     ]
     def DOMAIN = ""
     def dockerImageWithTag = ""
@@ -135,7 +135,7 @@ cp src/main/resources/config/application-prod.yml quickbook-config/
 cp quickbook-config/application-prod.yml quickbook-config/application-dev.yml
 tar -czf quickbook-config.tar.gz quickbook-config/
 rm -rf quickbook-config/
-scp quickbook-config.tar.gz ec2-user@18.141.143.199:/home/ec2-user/quickbook-config.tar.gz
+scp quickbook-config.tar.gz ec2-user@18.140.71.163:/home/ec2-user/quickbook-config.tar.gz
 rm quickbook-config.tar.gz
           """
         }
@@ -153,14 +153,14 @@ rm quickbook-config.tar.gz
         sh """
 cd BidClips-EKS/Kubernetes/application-stack/
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#$dockerImageWithTag#g' quickbook.yaml
-scp quickbook.yaml ec2-user@18.141.143.199:/home/ec2-user/quickbook.yaml
+scp quickbook.yaml ec2-user@18.140.71.163:/home/ec2-user/quickbook.yaml
         """
       }
     }
 
     stage("Deploying ${DEPLOYTAG}"){
       sh """
-ssh -tt ec2-user@18.141.143.199 /bin/bash << EOA
+ssh -tt ec2-user@18.140.71.163 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lh quickbook*
 tar -xzf /home/ec2-user/quickbook-config.tar.gz
