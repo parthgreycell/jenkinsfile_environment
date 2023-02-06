@@ -66,10 +66,10 @@ node("built-in"){
     def repoRegion = ""
     def dockerImageWithTag = "4b5897a"
     def bootstrapper = [
-      "dev": "18.141.143.199",
-      "qa": "18.141.143.199",
-      "uat": "18.141.143.199",
-      "prod": "18.141.143.199"
+      "dev": "18.140.71.163",
+      "qa": "18.140.71.163",
+      "uat": "18.140.71.163",
+      "prod": "18.140.71.163"
     ]
     stage('Preparation'){
       if (''.equals(TagName)){
@@ -133,14 +133,14 @@ sed -i 's#REPLACEME_MONGODB_URI#$mongoURI#g' mainstreet.yaml
 sed -i 's#REPLACEME_JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET#$mainstreet_secret#g' mainstreet.yaml
 ls
 pwd
-scp mainstreet.yaml ec2-user@18.141.143.199:/home/ec2-user/mainstreet.yaml
+scp mainstreet.yaml ec2-user@18.140.71.163:/home/ec2-user/mainstreet.yaml
             """
           }
       }
     }
     stage("Deploying ${DEPLOYTAG}"){
       sh """
-ssh -tt ec2-user@18.141.143.199 /bin/bash << EOA
+ssh -tt ec2-user@18.140.71.163 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lah
 aws eks update-kubeconfig --name bidclips-parth
