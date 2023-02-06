@@ -66,10 +66,10 @@ node("built-in"){
     def repoRegion = ""
     def dockerImageWithTag = ""
     def bootstrapper = [
-      "dev": "18.141.143.199",
-      "qa": "18.141.143.199",
-      "uat": "18.141.143.199",
-      "prod": "18.141.143.199"
+      "dev": "18.140.71.163",
+      "qa": "18.140.71.163",
+      "uat": "18.140.71.163",
+      "prod": "18.140.71.163"
     ]
     stage('Preparation'){
       if (''.equals(TagName)){
@@ -110,19 +110,19 @@ node("built-in"){
         sh """
 cd BidClips-EKS/Kubernetes/application-stack/
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#$dockerImageWithTag#g' provider-portal.yaml
-scp provider-portal.yaml appuser@${bootstrapper.get(DeployEnv)}:/home/appuser/provider-portal.yaml
+scp provider-portal.yaml ec2-user@18.140.71.163:/home/ec2-user/provider-portal.yaml
         """
       }
     }
     stage("Deploying ${DEPLOYTAG}"){
       sh """
-ssh -tt appuser@${bootstrapper.get(DeployEnv)} /bin/bash << EOA
+ssh -tt ec2-user@18.140.71.163 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lh provider-portal.yaml
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config apply -f provider-portal.yaml
+kubectl apply -f provider-portal.yaml
 rm provider-portal.yaml
 sleep 5;
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config -n app-stack get deploy | grep "provider-portal"
+kubectl -n app-stack get deploy | grep "provider-portal"
 exit
 EOA
       """
