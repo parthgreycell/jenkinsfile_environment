@@ -25,10 +25,10 @@ node("built-in"){
     def DEPLOYTAG = ""
     def repoRegion = ""
     def bootstrapper = [
-      "dev": "18.141.143.199",
-      "qa": "18.141.143.199",
-      "uat": "18.141.143.199",
-      "prod": "18.141.143.199"
+      "dev": "18.140.71.163",
+      "qa": "18.140.71.163",
+      "uat": "18.140.71.163",
+      "prod": "18.140.71.163"
     ]
     def DOMAIN = ""
     def dockerImageWithTag = ""
@@ -499,7 +499,7 @@ node("built-in"){
           cp common/BidClips-Web-Gateway-provider/logback.xml gateway-config/logback-spring.xml
           tar -czf gateway-config.tar.gz gateway-config/
           rm -rf gateway-config/
-          scp gateway-config.tar.gz appuser@${bootstrapper.get(DeployEnv)}:/home/appuser/gateway-config.tar.gz
+          scp gateway-config.tar.gz ec2-user@18.140.71.163:/home/ec2-user/gateway-config.tar.gz
           rm gateway-config.tar.gz
           """
         }
@@ -518,13 +518,13 @@ sed -i 's#REPLACEME_JAVA_OPTIONS#${java_options}#g' gateway.yaml
 sed -i 's#REPLACEME_DATA_CHANGE_EVENT#${stale_data_change_event}#g' gateway.yaml
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#${dockerImageWithTag}#g' gateway-internal.yaml
 sed -i 's#REPLACEME_DATA_CHANGE_EVENT#${stale_data_change_event}#g' gateway-internal.yaml
-scp gateway.yaml appuser@${bootstrapper.get(DeployEnv)}:/home/appuser/gateway.yaml
-scp gateway-internal.yaml appuser@${bootstrapper.get(DeployEnv)}:/home/appuser/gateway-internal.yaml
+scp gateway.yaml ec2-user@18.140.71.163:/home/ec2-user/gateway.yaml
+scp gateway-internal.yaml ec2-user@18.140.71.163:/home/ec2-user/gateway-internal.yaml
 if [ -f 'gateway-backend.yaml' ];then
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#${dockerImageWithTag}#g' gateway-backend.yaml
 sed -i 's#REPLACEME_JAVA_OPTIONS#${java_options}#g' gateway-backend.yaml
 sed -i 's#REPLACEME_DATA_CHANGE_EVENT#${active_data_change_event}#g' gateway-backend.yaml
-scp gateway-backend.yaml appuser@${bootstrapper.get(DeployEnv)}:/home/appuser/gateway-backend.yaml
+scp gateway-backend.yaml ec2-user@18.140.71.163:/home/ec2-user/gateway-backend.yaml
 fi
         """
       }
@@ -532,22 +532,22 @@ fi
 
     stage("Deploying ${DEPLOYTAG}"){
       sh """
-ssh -tt appuser@${bootstrapper.get(DeployEnv)} /bin/bash << EOA
+ssh -tt ec2-user@18.140.71.163 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lh gateway*
 tar -xzf gateway-config.tar.gz
 rm gateway-config.tar.gz
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config -n app-stack delete configmap gateway-config
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config -n app-stack create configmap gateway-config --from-file=gateway-config/
+kubectl -n app-stack delete configmap gateway-config
+kubectl -n app-stack create configmap gateway-config --from-file=gateway-config/
 sleep 5;
 rm -rf gateway-config/
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config apply -f gateway.yaml -f gateway-internal.yaml
+kubectl apply -f gateway.yaml -f gateway-internal.yaml
 if [ -f 'gateway-backend.yaml' ];then
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config apply -f gateway-backend.yaml
+kubectl apply -f gateway-backend.yaml
 fi
 rm gateway*
 sleep 5;
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config -n app-stack get deploy | grep gateway
+kubectl -n app-stack get deploy | grep gateway
 exit
 EOA
       """
