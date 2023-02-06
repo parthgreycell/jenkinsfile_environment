@@ -110,19 +110,19 @@ node("built-in"){
         sh """
 cd BidClips-EKS/Kubernetes/application-stack/
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#$dockerImageWithTag#g' widget.yaml
-scp widget.yaml appuser@${bootstrapper.get(DeployEnv)}:/home/appuser/widget.yaml
+scp widget.yaml ec2-user@18.140.71.163:/home/ec2-user/widget.yaml
         """
       }
     }
     stage("Deploying ${DEPLOYTAG}"){
       sh """
-ssh -tt appuser@${bootstrapper.get(DeployEnv)} /bin/bash << EOA
+ssh -tt ec2-user@18.140.71.163 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lh widget.yaml
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config apply -f widget.yaml
+kubectl apply -f widget.yaml
 rm widget.yaml
 sleep 5;
-kubectl --kubeconfig=/home/appuser/.kube/bidclips_${DeployEnv}_config -n app-stack get deploy | grep "widget"
+kubectl -n app-stack get deploy | grep "widget"
 exit
 EOA
       """
