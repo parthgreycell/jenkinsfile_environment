@@ -7,7 +7,7 @@ node{
       disableResume(),
       parameters([
         // choice(choices: ['dev', 'qa', 'uat', 'prod'], description: '', name: 'BuildProfile'),
-        choice(choices: ['dev'], description: '', name: 'BuildProfile'),
+        choice(choices: ['newdev'], description: '', name: 'BuildProfile'),
         [$class: 'ListSubversionTagsParameterDefinition', credentialsId: 'munjal-gc-un-pw', defaultValue: '', maxTags: '', name: 'TagName', reverseByDate: true, reverseByName: false, tagsDir: 'https://github.com/BidClips/BidClips-QuickBook-API.git', tagsFilter: '']
       ])
     ])
@@ -24,7 +24,7 @@ node{
         if (TagName.startsWith('tags')) {
           checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: 'refs/${TagName}']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-QuickBook-API.git']]]
           PUBLISHTAG = TagName.split('/')[1]
-          repoRegion = "ap-southeast-1"
+          repoRegion = "us-east-1"
         }
         if (TagName.startsWith('branches')) {
           def branch = TagName.split('/')[1]
@@ -33,7 +33,7 @@ node{
             script: 'echo $(git log -1 --pretty=%h)',
             returnStdout: true
           ).trim()
-          repoRegion = "ap-southeast-1"
+          repoRegion = "us-west-1"
         }
         if (TagName.equals('trunk')) {
           TagName = 'branches/master'
@@ -42,7 +42,7 @@ node{
             script: 'echo $(git log -1 --pretty=%h)',
             returnStdout: true
           ).trim()
-          repoRegion = "ap-southeast-1"
+          repoRegion = "us-west-1"
 
         }
       }
@@ -51,7 +51,7 @@ node{
     stage('Building Docker Image'){
       dir('BidClips-QuickBook-API') {
         def BUILDENV = ""
-        if(BuildProfile=="dev"){
+        if(BuildProfile=="newdev"){
           BUILDENV="dev"
         } else {
           BUILDENV="prod"
@@ -74,7 +74,7 @@ aws ecr get-login-password --region ${repoRegion} | docker login --username AWS 
 docker tag bidclipsquickbookapi:latest 566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-quickbook-api:${PUBLISHTAG}
 docker push 566570633830.dkr.ecr.${repoRegion}.amazonaws.com/bidclips-quickbook-api:${PUBLISHTAG}
         """
-          if(repoRegion == "us-east-1"){
+      if(repoRegion == "us-east-1"){
         // us-east-1 means docker image built from tag; not branch
         // if so, push it to prod ecr as well, to avoid cross-tenant authorization pain
         sh """
