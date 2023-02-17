@@ -1,0 +1,97 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: bidclips-parth
+  version: "1.21"  # specifies kubernetes version on AWS EKS
+  region: ap-southeast-1
+
+vpc:
+  autoAllocateIPv6: true  # this will enable dual stack networking support for load balancers
+  nat:
+    gateway: "HighlyAvailable"  # this will create one NAT gateway (and one EIP) per availability zone
+
+nodeGroups:
+  - name: newdev-ng-c5-xl-new
+    instanceType: m5.xlarge
+    instancePrefix: prod-aws-mngd
+    instanceName: eks-node
+    minSize: 2
+    desiredCapacity: 2
+    maxSize: 3
+    volumeSize: 100
+    volumeType: gp2
+    amiFamily: AmazonLinux2
+    labels: {role: worker, alb: true}
+    tags:
+      nodegroup-role: worker
+    privateNetworking: true
+    availabilityZones: ["ap-southeast-1a", "ap-southeast-1b", "ap-southeast-1c"]  # , "us-east-1d", "us-east-1f"]
+    updateConfig:
+      maxUnavailable: 1
+      # maxUnavailablePercentage: 25%
+    containerRuntime: containerd
+    iam:
+      withAddonPolicies:
+        albIngress: true
+        autoScaler: true
+
+  # autoscaling will happen on this nodegroup
+  - name: newdev-ng-c5-xl-gateway-backend
+    instanceType: c5.xlarge
+    instancePrefix: prod-aws-mngd
+    instanceName: gateway-backend
+    minSize: 2
+    desiredCapacity: 2
+    maxSize: 3
+    volumeSize: 100
+    volumeType: gp2
+    amiFamily: AmazonLinux2
+    labels: {role: worker, purpose: gateway-backend}
+    taints:
+    - key: "purpose"
+      value: "gateway-backend"
+      effect: "NoSchedule"
+    tags:
+      nodegroup-role: worker
+    privateNetworking: true
+    availabilityZones: ["ap-southeast-1a", "ap-southeast-1b", "ap-southeast-1c"]  # , "us-east-1d", "us-east-1f"]
+    updateConfig:
+      maxUnavailable: 1
+      # maxUnavailablePercentage: 25%
+    containerRuntime: containerd
+    iam:
+      withAddonPolicies:
+        albIngress: true
+        autoScaler: true
+        cloudWatch: true
+
+  - name: newdev-ng-prod-c5-xl-gateway-frontend
+    instanceType: c5.xlarge
+    instancePrefix: prod-aws-mngd
+    instanceName: gateway-frontend
+    minSize: 2
+    desiredCapacity: 2
+    maxSize: 3
+    volumeSize: 100
+    volumeType: gp2
+    amiFamily: AmazonLinux2
+    labels: {role: worker, purpose: gateway-frontend, alb: true}
+    taints:
+    - key: "purpose"
+      value: "gateway-frontend"
+      effect: "NoSchedule"
+    tags:
+      nodegroup-role: worker
+    privateNetworking: true
+    availabilityZones: ["ap-southeast-1a", "ap-southeast-1b", "ap-southeast-1c"]  # , "us-east-1d", "us-east-1f"]
+    updateConfig:
+      maxUnavailable: 1
+      # maxUnavailablePercentage: 25%
+    containerRuntime: containerd
+    iam:
+      withAddonPolicies:
+        albIngress: true
+        autoScaler: true
+        cloudWatch: true
+
+availabilityZones: ["ap-southeast-1a", "ap-southeast-1b", "ap-southeast-1c"]  # , "us-east-1d", "us-east-1f"]
