@@ -5,17 +5,17 @@ node("built-in"){
       disableConcurrentBuilds(abortPrevious: false),
       disableResume(),
       parameters([
-        choice(choices: ['dev', 'qa', 'uat', 'prod'], description: '', name: 'DeployEnv'),
+        choice(choices: ['newdev'], description: '', name: 'DeployEnv'),
         [$class: 'ListSubversionTagsParameterDefinition', credentialsId: 'munjal-gc-un-pw', defaultValue: '', maxTags: '', name: 'TagName', reverseByDate: true, reverseByName: false, tagsDir: 'https://github.com/BidClips/BidClips-API-Restheart.git', tagsFilter: '']
       ])
     ])
     def DEPLOYTAG = ""
     def dockerImageWithTag = ""
     def repoRegion = [
-      "dev": "ap-southeast-1", /* "ap-south-1", */
+      "newdev": "ap-southeast-1", /* "ap-south-1", */
     ]
     def bootstrapper = [
-      "dev": "3.0.102.120"
+      "newdev": "3.0.102.120"
     ]
     stage('Preparation'){
       if (''.equals(TagName)){
@@ -77,7 +77,7 @@ node("built-in"){
         def awssqs_v2_queue_id = ''
         def bidclips_idm_id = ''
 
-        if (DeployEnv == 'dev') {
+        if (DeployEnv == 'newdev') {
           mongo_uri_id = "4de895fa-0e94-4f86-bb8d-99a9d601e1f1"
           awssqs_accesskey_id = "87297187-8a00-42e3-b09a-132ddf479129"
           awssqs_secretKey_id = "ceebc20f-3712-42b2-bc8d-c8373ede91df"

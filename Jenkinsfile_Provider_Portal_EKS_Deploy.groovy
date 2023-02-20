@@ -58,7 +58,7 @@ node("built-in"){
       disableConcurrentBuilds(abortPrevious: false),
       disableResume(),
       parameters([
-        choice(choices: ['dev', 'qa', 'uat', 'prod'], description: '', name: 'DeployEnv'),
+        choice(choices: ['newdev', 'qa', 'uat', 'prod'], description: '', name: 'DeployEnv'),
         [$class: 'ListSubversionTagsParameterDefinition', credentialsId: 'munjal-gc-un-pw', defaultValue: '', maxTags: '', name: 'TagName', reverseByDate: true, reverseByName: false, tagsDir: 'https://github.com/BidClips/BidClips-Web-Provider-Portal.git', tagsFilter: '']
       ])
     ])
@@ -66,7 +66,7 @@ node("built-in"){
     def repoRegion = ""
     def dockerImageWithTag = ""
     def bootstrapper = [
-      "dev": "3.0.102.120"
+      "newdev": "3.0.102.120"
     ]
     stage('Preparation'){
       if (''.equals(TagName)){

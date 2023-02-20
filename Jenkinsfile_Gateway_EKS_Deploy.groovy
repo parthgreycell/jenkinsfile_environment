@@ -18,14 +18,14 @@ node("built-in"){
       disableConcurrentBuilds(abortPrevious: false),
       disableResume(),
       parameters([
-        choice(choices: ['dev', 'qa', 'uat', 'prod'], description: '', name: 'DeployEnv'),
+        choice(choices: ['newdev'], description: '', name: 'DeployEnv'),
         [$class: 'ListSubversionTagsParameterDefinition', credentialsId: 'munjal-gc-un-pw', name: 'TagName', reverseByDate: true, reverseByName: false, tagsDir: 'https://github.com/BidClips/BidClips-Web-Gateway.git']
       ])
     ])
     def DEPLOYTAG = ""
     def repoRegion = ""
     def bootstrapper = [
-      "dev": "3.0.102.120"
+      "newdev": "3.0.102.120"
     ]
     def DOMAIN = ""
     def dockerImageWithTag = ""
@@ -240,7 +240,7 @@ node("built-in"){
           quickbook_url = "https://providers.bidclipsuat.com/api/quickbook"
         }
 
-        if (DeployEnv == 'dev') {
+        if (DeployEnv == 'newdev') {
           mongo_uri_id = 'fa0513f2-3763-4c81-ac42-fb1945efbd2a'
           eureka_defaultzone = 'cc22e9c8-b47e-4d5f-9512-a857afc7cfe4'
           database = 'ff82a393-4078-4c50-8e5d-c7efb0974cb2'
@@ -285,15 +285,15 @@ node("built-in"){
           awscf_accesskey = 'cad021ff-5eb3-4182-8dd8-13530e8fe489'
           awscf_secretkey = '27c057dc-3786-465a-80fe-52d21c34ecea'
           awscf_region = '5b55ba1d-04b4-4548-90d9-85969cadab04'
-          custom_mail_from = "do-not-reply@bidclips.dev"
-          custom_mail_base_url = "https://providers.bidclips.dev"
-          custom_mail_domain = "bidclips.dev"
+          custom_mail_from = "do-not-reply@bidclips.newdev"
+          custom_mail_base_url = "https://providers.bidclips.newdev"
+          custom_mail_domain = "bidclips.newdev"
           custom_mail_user = "do-not-reply"
-          custom_mail_shop_domain = "shop.bidclips.dev"
+          custom_mail_shop_domain = "shop.bidclips.newdev"
           twilio_sms_account_sid = 'a469c4ee-f928-4093-9441-0d8995a8a633'
           twilio_sms_auth_token = '904efafc-d8c9-472e-8371-8252dfab2caa'
           twilio_sms_webhook_url = 'c0e212d4-bc6b-4502-9603-045f0c164b23'
-          quickbook_url = "https://providers.bidclips.dev/api/quickbook"
+          quickbook_url = "https://providers.bidclips.newdev/api/quickbook"
         }
 
         if (DeployEnv == 'prod') {
@@ -420,67 +420,67 @@ node("built-in"){
             stale_data_change_event = var_data_change_event
             active_data_change_event = var_v2_data_change_event
           sh """
-          ls -alh common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_MONGODB_CONNECTION_URL#$var_mongo_uri_id#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_EUREKA_DEFAULTZONE#$var_eureka_defaultzone#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_DATABASE#$var_database#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_MAIL_HOST#$var_mail_host#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_MAIL_USERNAME#$var_mail_username#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_MAIL_PASSWORD#$var_mail_password#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_SSL_TRUST#$var_ssl_trust#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_SENDGRID_PASSWORD#$var_sendgrid_password#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_WEBPUSH_PRIVATE_KEY#$var_web_pushkey_private#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_WEBPUSH_PUBLIC_KEY#$var_web_pushkey_public#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_ZIPKIN_BASE_URL#$var_zipkin_base_url#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_SECRET#$var_secret#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_MAIL_FROM#$var_mail_from#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_MAIL_BASE_URL#$var_mail_base_url#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_TWILIO_ACCOUNT_SID#$var_twilio_account_sid#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_TWILIO_API_KEY#$var_twilio_api_key#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_TWILIO_API_SECRET#$var_twilio_api_secret#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_TWILIO_CHAT_SERVICE_SID#$var_twilio_chat_service_sid#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_TWILIO_AUTH_TOKEN#$var_twilio_auth_token#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_TWILIO_PHONE_NUMBER#$var_twilio_phone_number#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWS_AWSS3_ACCESSKEY#$var_awss3_accesskey#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWS_AWSS3_SECRETKEY#$var_awss3_secretkey#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWSLAMBDA_ACCESSKEY#$var_awslambda_accesskey#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWSLAMBDA_SECRETKEY#$var_awslambda_secretkey#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWS3JAVASCRIPT_ACCESSKEY#$var_aws3javascript_accesskey#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWS3JAVASCRIPT_SECRETKEY#$var_aws3javascript_secretkey#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWS3JAVASCRIPT_REGION#$var_aws3javascript_region#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWS3JAVASCRIPT_BUCKET#$var_aws3javascript_bucket#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWS3JAVASCRIPT_URL#$var_aws3javascript_URL#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_FUNCTIONNAMEIMAGEROTATION#$var_functionNameImageRotation#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWSCLOUD_ACCESSKEY#$var_awscloud_accesskey#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWSCLOUD_SECRETKEY#$var_awscloud_secretkey#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_BUCKETNAME#$var_bucketname#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_DATA_CHANGE_EVENT#$var_data_change_event#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_V2_DATA_CHANGE_EVENT#$var_v2_data_change_event#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWSS3_REGION_ID#$var_aws_s3_region_id#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWSLAMBDA_REGION_ID#$var_aws_lambda_region_id#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWSCLOUD_REGION_ID#$var_aws_cloud_region_id#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_RESTHEART_URL#$var_restheart_url#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_MAINSTREET_URL#$var_mainstreet_url#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWS_CLOUDFRONT_DISTRIBUTION_ID#$var_awscf_distribution_id#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWS_CLOUDFRONT_ACCESSKEY#$var_awscf_accesskey#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWS_CLOUDFRONT_SECRETKEY#$var_awscf_secretkey#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_AWS_CLOUDFRONT_REGION#$var_awscf_region#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_CUSTOM_MAIL_FROM#${custom_mail_from}#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_CUSTOM_MAIL_BASE_URL#${custom_mail_base_url}#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_CUSTOM_MAIL_DOMAIN#${custom_mail_domain}#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_CUSTOM_MAIL_USER#${custom_mail_user}#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_CUSTOM_MAIL_SHOP_DOMAIN#${custom_mail_shop_domain}#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_TWILIO_SMS_ACCOUNT_SID#$var_twilio_sms_account_sid#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_TWILIO_SMS_AUTH_TOKEN#$var_twilio_sms_auth_token#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_TWILIO_SMS_WEBHOOK_URL#$var_twilio_sms_webhook_url#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_THREAD_POOL_CORE_SIZE#${thread_pool_core_size}#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_THREAD_POOL_MAX_SIZE#${thread_pool_max_size}#g' common/BidClips-Web-Gateway-provider/application-dev.yml
-          sed -i 's#REPLACEME_QUICKBOOK_URL#${quickbook_url}#g' common/BidClips-Web-Gateway-provider/application-dev.yml
+          ls -alh common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_MONGODB_CONNECTION_URL#$var_mongo_uri_id#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_EUREKA_DEFAULTZONE#$var_eureka_defaultzone#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_DATABASE#$var_database#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_MAIL_HOST#$var_mail_host#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_MAIL_USERNAME#$var_mail_username#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_MAIL_PASSWORD#$var_mail_password#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_SSL_TRUST#$var_ssl_trust#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_SENDGRID_PASSWORD#$var_sendgrid_password#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_WEBPUSH_PRIVATE_KEY#$var_web_pushkey_private#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_WEBPUSH_PUBLIC_KEY#$var_web_pushkey_public#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_ZIPKIN_BASE_URL#$var_zipkin_base_url#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_SECRET#$var_secret#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_MAIL_FROM#$var_mail_from#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_MAIL_BASE_URL#$var_mail_base_url#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_TWILIO_ACCOUNT_SID#$var_twilio_account_sid#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_TWILIO_API_KEY#$var_twilio_api_key#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_TWILIO_API_SECRET#$var_twilio_api_secret#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_TWILIO_CHAT_SERVICE_SID#$var_twilio_chat_service_sid#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_TWILIO_AUTH_TOKEN#$var_twilio_auth_token#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_TWILIO_PHONE_NUMBER#$var_twilio_phone_number#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWS_AWSS3_ACCESSKEY#$var_awss3_accesskey#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWS_AWSS3_SECRETKEY#$var_awss3_secretkey#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWSLAMBDA_ACCESSKEY#$var_awslambda_accesskey#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWSLAMBDA_SECRETKEY#$var_awslambda_secretkey#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWS3JAVASCRIPT_ACCESSKEY#$var_aws3javascript_accesskey#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWS3JAVASCRIPT_SECRETKEY#$var_aws3javascript_secretkey#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWS3JAVASCRIPT_REGION#$var_aws3javascript_region#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWS3JAVASCRIPT_BUCKET#$var_aws3javascript_bucket#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWS3JAVASCRIPT_URL#$var_aws3javascript_URL#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_FUNCTIONNAMEIMAGEROTATION#$var_functionNameImageRotation#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWSCLOUD_ACCESSKEY#$var_awscloud_accesskey#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWSCLOUD_SECRETKEY#$var_awscloud_secretkey#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_BUCKETNAME#$var_bucketname#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_DATA_CHANGE_EVENT#$var_data_change_event#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_V2_DATA_CHANGE_EVENT#$var_v2_data_change_event#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWSS3_REGION_ID#$var_aws_s3_region_id#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWSLAMBDA_REGION_ID#$var_aws_lambda_region_id#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWSCLOUD_REGION_ID#$var_aws_cloud_region_id#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_RESTHEART_URL#$var_restheart_url#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_MAINSTREET_URL#$var_mainstreet_url#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWS_CLOUDFRONT_DISTRIBUTION_ID#$var_awscf_distribution_id#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWS_CLOUDFRONT_ACCESSKEY#$var_awscf_accesskey#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWS_CLOUDFRONT_SECRETKEY#$var_awscf_secretkey#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_AWS_CLOUDFRONT_REGION#$var_awscf_region#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_CUSTOM_MAIL_FROM#${custom_mail_from}#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_CUSTOM_MAIL_BASE_URL#${custom_mail_base_url}#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_CUSTOM_MAIL_DOMAIN#${custom_mail_domain}#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_CUSTOM_MAIL_USER#${custom_mail_user}#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_CUSTOM_MAIL_SHOP_DOMAIN#${custom_mail_shop_domain}#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_TWILIO_SMS_ACCOUNT_SID#$var_twilio_sms_account_sid#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_TWILIO_SMS_AUTH_TOKEN#$var_twilio_sms_auth_token#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_TWILIO_SMS_WEBHOOK_URL#$var_twilio_sms_webhook_url#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_THREAD_POOL_CORE_SIZE#${thread_pool_core_size}#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_THREAD_POOL_MAX_SIZE#${thread_pool_max_size}#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
+          sed -i 's#REPLACEME_QUICKBOOK_URL#${quickbook_url}#g' common/BidClips-Web-Gateway-provider/application-newdev.yml
 
 
           mkdir gateway-config/
-          cp common/BidClips-Web-Gateway-provider/application-dev.yml gateway-config/application-dev.yml
-          cp gateway-config/application-dev.yml gateway-config/application-prod.yml
+          cp common/BidClips-Web-Gateway-provider/application-newdev.yml gateway-config/application-newdev.yml
+          cp gateway-config/application-newdev.yml gateway-config/application-prod.yml
           cp common/BidClips-Web-Gateway-provider/logback.xml gateway-config/logback-spring.xml
           tar -czf gateway-config.tar.gz gateway-config/
           rm -rf gateway-config/

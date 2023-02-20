@@ -13,7 +13,7 @@ node("built-in"){
     def repoRegion = ""
     def dockerImageWithTag = ""
     def bootstrapper = [
-      "dev": "3.0.102.120"
+      "newdev": "3.0.102.120"
     ]
     stage('Preparation'){
       if (''.equals(TagName)){

@@ -58,7 +58,7 @@ node("built-in"){
       disableConcurrentBuilds(abortPrevious: false),
       disableResume(),
       parameters([
-        choice(choices: ['dev', 'qa', 'uat', 'prod'], description: '', name: 'DeployEnv'),
+        choice(choices: ['newdev', 'qa', 'uat', 'prod'], description: '', name: 'DeployEnv'),
         [$class: 'ListSubversionTagsParameterDefinition', credentialsId: 'munjal-gc-un-pw', defaultValue: '', maxTags: '', name: 'TagName', reverseByDate: true, reverseByName: false, tagsDir: 'https://github.com/BidClips/BidClips-Mainstreet-API.git', tagsFilter: '']
       ])
     ])
@@ -66,7 +66,7 @@ node("built-in"){
     def repoRegion = ""
     def dockerImageWithTag = "4b5897a"
     def bootstrapper = [
-      "dev": "3.0.102.120"
+      "newdev": "3.0.102.120"
     ]
     stage('Preparation'){
       if (''.equals(TagName)){
@@ -100,7 +100,7 @@ node("built-in"){
       
       def mainstreet_secret_id = ''
       def mongo_uri_id = ''
-      if (DeployEnv == 'dev') {
+      if (DeployEnv == 'newdev') {
         mainstreet_secret_id = "98196e50-0432-44f4-b3e6-1daf173f67dd"
         mongo_uri_id = "b8dbbe2f-0fc8-4430-8cda-8297d8ca7311"
       }

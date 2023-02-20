@@ -58,14 +58,14 @@ node("built-in"){
       disableConcurrentBuilds(abortPrevious: false),
       disableResume(),
       parameters([
-        choice(choices: ['dev', 'qa', 'uat', 'prod'], description: '', name: 'DeployEnv'),
+        choice(choices: ['newdev'], description: '', name: 'DeployEnv'),
         [$class: 'ListSubversionTagsParameterDefinition', credentialsId: 'munjal-gc-un-pw', name: 'TagName', reverseByDate: true, reverseByName: false, tagsDir: 'https://github.com/BidClips/BidClips-TaxJar-API.git']
       ])
     ])
     def DEPLOYTAG = ""
     def repoRegion = ""
     def bootstrapper = [
-      "dev": "3.0.102.120"
+      "newdev": "3.0.102.120"
     ]
     def DOMAIN = ""
     def dockerImageWithTag = ""
@@ -107,7 +107,7 @@ node("built-in"){
           def mongo_uri = ""
           def restheart_url = ""
           def base64_secret = ""
-          if(DeployEnv=="dev"){
+          if(DeployEnv=="newdev"){
             taxjar_api_key = "9746ef40-e353-46e6-841f-c36309a99ec8"
             taxjar_path = "e8e70e6c-9dd2-434d-be12-ad74cad44f95"
             base64_secret = "7d577f14-79f4-49fd-80b6-eddc68b92a88"

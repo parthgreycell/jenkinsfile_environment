@@ -5,14 +5,14 @@ node("built-in"){
       disableConcurrentBuilds(abortPrevious: false),
       disableResume(),
       parameters([
-        choice(choices: ['dev'], description: '', name: 'DeployEnv'),
+        choice(choices: ['newdev'], description: '', name: 'DeployEnv'),
         [$class: 'ListSubversionTagsParameterDefinition', credentialsId: 'munjal-gc-un-pw', name: 'TagName', reverseByDate: true, reverseByName: false, tagsDir: 'https://github.com/BidClips/BidClips-QuickBook-API.git']
       ])
     ])
     def DEPLOYTAG = ""
     def repoRegion = ""
     def bootstrapper = [
-      "dev": "3.0.102.120"
+      "newdev": "3.0.102.120"
     ]
     def DOMAIN = ""
     def dockerImageWithTag = ""
@@ -57,7 +57,7 @@ node("built-in"){
         def quickbook_oauth2appredirecturi = ""
         def quickbook_intuitaccountingapihost = ""
 
-        if(DeployEnv=="dev"){
+        if(DeployEnv=="newdev"){
           // env creds here
           mongodb_connection_url = "fa0513f2-3763-4c81-ac42-fb1945efbd2a"
           base64_secret = "7d577f14-79f4-49fd-80b6-eddc68b92a88"
