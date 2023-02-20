@@ -13,15 +13,9 @@ node("built-in"){
     def dockerImageWithTag = ""
     def repoRegion = [
       "dev": "ap-southeast-1", /* "ap-south-1", */
-      "qa": "ap-southeast-1",
-      "uat": "ap-southeast-1",
-      "prod": "ap-southeast-1"
     ]
     def bootstrapper = [
-      "dev": "18.140.71.163",
-      "qa": "18.140.71.163",
-      "uat": "18.140.71.163",
-      "prod": "18.140.71.163"
+      "dev": "3.0.102.120"
     ]
     stage('Preparation'){
       if (''.equals(TagName)){
@@ -125,7 +119,7 @@ sed -i 's#REPLACEME_V2_QUEUE#$real_awssqs_v2_queue_id#g' common/BidClips-API-Res
 sed -i 's#REPLACEME_IDM_SECRET#$real_bidclips_idm_id#g' common/BidClips-API-Restheart/etc/restheart.yml
 cd common/BidClips-API-Restheart/
 tar -czf restheart-conf.tar.gz etc/
-scp restheart-conf.tar.gz ec2-user@18.140.71.163:/home/ec2-user/restheart-conf.tar.gz
+scp restheart-conf.tar.gz ec2-user@3.0.102.120:/home/ec2-user/restheart-conf.tar.gz
 rm restheart-conf.tar.gz
               """
         }
@@ -135,14 +129,14 @@ rm restheart-conf.tar.gz
         sh """
 cd BidClips-EKS/Kubernetes/application-stack/
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#$dockerImageWithTag#g' restheart.yaml
-scp restheart.yaml ec2-user@18.140.71.163:/home/ec2-user/restheart.yaml
+scp restheart.yaml ec2-user@3.0.102.120:/home/ec2-user/restheart.yaml
         """
       }
     }
 
     stage("Deploying ${DEPLOYTAG}"){
       sh """
-ssh -tt ec2-user@18.140.71.163 /bin/bash << EOA
+ssh -tt ec2-user@3.0.102.120 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lh restheart.*
 tar -xzf restheart-conf.tar.gz

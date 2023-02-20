@@ -65,10 +65,7 @@ node("built-in"){
     def DEPLOYTAG = ""
     def repoRegion = ""
     def bootstrapper = [
-      "dev": "18.140.71.163",
-      "qa": "18.140.71.163",
-      "uat": "18.140.71.163",
-      "prod": "18.140.71.163"
+      "dev": "3.0.102.120"
     ]
     def DOMAIN = ""
     def dockerImageWithTag = ""
@@ -161,7 +158,7 @@ cp src/main/resources/config/application-prod.yml taxjar-config/
 cp taxjar-config/application-prod.yml taxjar-config/application-dev.yml
 tar -czf taxjar-config.tar.gz taxjar-config/
 rm -rf taxjar-config/
-scp taxjar-config.tar.gz ec2-user@18.140.71.163:/home/ec2-user/taxjar-config.tar.gz
+scp taxjar-config.tar.gz ec2-user@3.0.102.120:/home/ec2-user/taxjar-config.tar.gz
 rm taxjar-config.tar.gz
                 """
             }
@@ -179,14 +176,14 @@ rm taxjar-config.tar.gz
         }
         sh """
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#$dockerImageWithTag#g' BidClips-EKS/Kubernetes/application-stack/taxjar.yaml
-scp BidClips-EKS/Kubernetes/application-stack/taxjar.yaml ec2-user@18.140.71.163:/home/ec2-user/taxjar.yaml
+scp BidClips-EKS/Kubernetes/application-stack/taxjar.yaml ec2-user@3.0.102.120:/home/ec2-user/taxjar.yaml
         """
       }
     }
 
     stage("Deploying ${DEPLOYTAG}"){
       sh """
-ssh -tt ec2-user@18.140.71.163 /bin/bash << EOA
+ssh -tt ec2-user@3.0.102.120 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lh taxjar*
 tar -xzf taxjar-config.tar.gz

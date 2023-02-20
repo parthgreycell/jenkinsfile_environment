@@ -12,7 +12,7 @@ node("built-in"){
     def DEPLOYTAG = ""
     def repoRegion = ""
     def bootstrapper = [
-      "dev": "18.140.71.163"
+      "dev": "3.0.102.120"
     ]
     def DOMAIN = ""
     def dockerImageWithTag = ""
@@ -68,39 +68,6 @@ node("built-in"){
           quickbook_oauth2appredirecturi = "6e18d9ca-674d-4dc4-bb36-d8e0de707594"
           quickbook_intuitaccountingapihost = "25eeb115-3c78-4f05-9fab-b70dbf30e85f"
         }
-        // if(DeployEnv=="qa"){
-        //   // env creds here
-        //   mongodb_connection_url = "c30e77e1-8741-452f-ba58-f4d0724eb1c4"
-        //   base64_secret = "49fe8b37-ac9c-4723-8e88-8833fffc52fe"
-        //   restheart_url = "d7c6eeed-22ae-49ca-ad39-a1f4a36ca096"
-        //   redirect_api = "44d8b732-d0ac-44b8-93ea-aefedcc5aa73"
-        //   quickbook_oauth2appclientid = "fb356003-a3d3-4f8f-b1c2-bcc65cecff3e"
-        //   quickbook_oauth2appclientsecret = "fe8c63d3-be49-43c5-84d8-3269e3baed08"
-        //   quickbook_oauth2appredirecturi = "c43f1548-79e7-4252-95fc-c3b03da244c7"
-        //   quickbook_intuitaccountingapihost = "25eeb115-3c78-4f05-9fab-b70dbf30e85f"
-        // }
-        // if(DeployEnv=="uat"){
-        //   // env creds here
-        //   mongodb_connection_url = "2311be07-35c4-4296-ba5b-a11e637e1787"
-        //   base64_secret = "6852d2ad-9d2e-45ef-8df4-74a9e75db153"
-        //   restheart_url = "3c287199-5a6f-4759-b4cb-43cbc0dd0a2c"
-        //   redirect_api = "dc79ac94-9ad9-4fd7-8597-30c3fef71082"
-        //   quickbook_oauth2appclientid = "1df88371-4053-4fb1-811b-f63181c5da41"
-        //   quickbook_oauth2appclientsecret = "091c40e7-5f29-4b7c-9f93-3ec1b8ceaac8"
-        //   quickbook_oauth2appredirecturi = "f46a7e3a-7294-4950-b0e1-db7662bf4086"
-        //   quickbook_intuitaccountingapihost = "25eeb115-3c78-4f05-9fab-b70dbf30e85f"
-        // }
-        // if(DeployEnv=="prod"){
-        //   // env creds here
-        //   mongodb_connection_url = "e1af3291-3e80-49c8-b5d0-77cd8cb6119c"
-        //   base64_secret = "0e3deb42-4fc5-4d1b-b6bd-91019debae9e"
-        //   restheart_url = "c0d52f8d-bf6e-418b-93e2-6d1048130843"
-        //   redirect_api = "69e2918f-77e2-40cf-bea6-d2d48310c064"
-        //   quickbook_oauth2appclientid = "cdec4f9f-5e37-4ab8-80b4-de1d0724599f"
-        //   quickbook_oauth2appclientsecret = "7b6342af-8b62-448d-a277-c044f0c02895"
-        //   quickbook_oauth2appredirecturi = "a6dbf227-30fa-4245-9757-8f833e961cfa"
-        //   quickbook_intuitaccountingapihost = "fde45074-8e8c-4f21-8542-477d4fe41e03"
-        // }
         withCredentials([
           string(credentialsId: mongodb_connection_url, variable: 'var_mongodb_connection_url'),
           string(credentialsId: base64_secret, variable: 'var_base64_secret'),
@@ -132,7 +99,7 @@ cp src/main/resources/config/application-prod.yml quickbook-config/
 cp quickbook-config/application-prod.yml quickbook-config/application-dev.yml
 tar -czf quickbook-config.tar.gz quickbook-config/
 rm -rf quickbook-config/
-scp quickbook-config.tar.gz ec2-user@18.140.71.163:/home/ec2-user/quickbook-config.tar.gz
+scp quickbook-config.tar.gz ec2-user@3.0.102.120:/home/ec2-user/quickbook-config.tar.gz
 rm quickbook-config.tar.gz
           """
         }
@@ -150,14 +117,14 @@ rm quickbook-config.tar.gz
         sh """
 cd BidClips-EKS/Kubernetes/application-stack/
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#$dockerImageWithTag#g' quickbook.yaml
-scp quickbook.yaml ec2-user@18.140.71.163:/home/ec2-user/quickbook.yaml
+scp quickbook.yaml ec2-user@3.0.102.120:/home/ec2-user/quickbook.yaml
         """
       }
     }
 
     stage("Deploying ${DEPLOYTAG}"){
       sh """
-ssh -tt ec2-user@18.140.71.163 /bin/bash << EOA
+ssh -tt ec2-user@3.0.102.120 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lh quickbook*
 tar -xzf /home/ec2-user/quickbook-config.tar.gz

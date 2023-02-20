@@ -21,7 +21,7 @@ nodeGroups:
     volumeSize: 100
     volumeType: gp2
     amiFamily: AmazonLinux2
-    labels: {role: worker, alb: true}
+    labels: {role: worker, alb: "true"}
     tags:
       nodegroup-role: worker
     privateNetworking: true
@@ -75,7 +75,7 @@ nodeGroups:
     volumeSize: 100
     volumeType: gp2
     amiFamily: AmazonLinux2
-    labels: {role: worker, purpose: gateway-frontend, alb: true}
+    labels: {role: worker, purpose: gateway-frontend, alb: "true"}
     taints:
     - key: "purpose"
       value: "gateway-frontend"
@@ -93,5 +93,4 @@ nodeGroups:
         albIngress: true
         autoScaler: true
         cloudWatch: true
-
 availabilityZones: ["ap-southeast-1a", "ap-southeast-1b", "ap-southeast-1c"]  # , "us-east-1d", "us-east-1f"]

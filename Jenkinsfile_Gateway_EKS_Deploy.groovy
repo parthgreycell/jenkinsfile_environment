@@ -25,10 +25,7 @@ node("built-in"){
     def DEPLOYTAG = ""
     def repoRegion = ""
     def bootstrapper = [
-      "dev": "18.140.71.163",
-      "qa": "18.140.71.163",
-      "uat": "18.140.71.163",
-      "prod": "18.140.71.163"
+      "dev": "3.0.102.120"
     ]
     def DOMAIN = ""
     def dockerImageWithTag = ""
@@ -69,18 +66,6 @@ node("built-in"){
       }
       dir('BidClips-Infrastructure'){
         checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: 'master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-Infrastructure.git']]]
-
-        // if (TagName.startsWith('tags')) {
-        //   checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: 'refs/${TagName}']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-Infrastructure.git']]]
-        // }
-        // if (TagName.startsWith('branches')) {
-        //   def branch = TagName.split('/')[1]
-        //   checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: branch]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-Infrastructure.git']]]
-        // }
-        // if (TagName.equals('trunk')) {
-        //   TagName = 'branches/master'
-        //   checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: 'master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'munjal-gc', url: 'git@github.com:BidClips/BidClips-Infrastructure.git']]]
-        // }
 
         if(DeployEnv == "prod"){
           dockerImageWithTag="875588116685.dkr.ecr.us-east-1.amazonaws.com/bidclips-web-gateway:${DEPLOYTAG}".replace(':','\\:')
@@ -499,7 +484,7 @@ node("built-in"){
           cp common/BidClips-Web-Gateway-provider/logback.xml gateway-config/logback-spring.xml
           tar -czf gateway-config.tar.gz gateway-config/
           rm -rf gateway-config/
-          scp gateway-config.tar.gz ec2-user@18.140.71.163:/home/ec2-user/gateway-config.tar.gz
+          scp gateway-config.tar.gz ec2-user@3.0.102.120:/home/ec2-user/gateway-config.tar.gz
           rm gateway-config.tar.gz
           """
         }
@@ -518,13 +503,13 @@ sed -i 's#REPLACEME_JAVA_OPTIONS#${java_options}#g' gateway.yaml
 sed -i 's#REPLACEME_DATA_CHANGE_EVENT#${stale_data_change_event}#g' gateway.yaml
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#${dockerImageWithTag}#g' gateway-internal.yaml
 sed -i 's#REPLACEME_DATA_CHANGE_EVENT#${stale_data_change_event}#g' gateway-internal.yaml
-scp gateway.yaml ec2-user@18.140.71.163:/home/ec2-user/gateway.yaml
-scp gateway-internal.yaml ec2-user@18.140.71.163:/home/ec2-user/gateway-internal.yaml
+scp gateway.yaml ec2-user@3.0.102.120:/home/ec2-user/gateway.yaml
+scp gateway-internal.yaml ec2-user@3.0.102.120:/home/ec2-user/gateway-internal.yaml
 if [ -f 'gateway-backend.yaml' ];then
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#${dockerImageWithTag}#g' gateway-backend.yaml
 sed -i 's#REPLACEME_JAVA_OPTIONS#${java_options}#g' gateway-backend.yaml
 sed -i 's#REPLACEME_DATA_CHANGE_EVENT#${active_data_change_event}#g' gateway-backend.yaml
-scp gateway-backend.yaml ec2-user@18.140.71.163:/home/ec2-user/gateway-backend.yaml
+scp gateway-backend.yaml ec2-user@3.0.102.120:/home/ec2-user/gateway-backend.yaml
 fi
         """
       }
@@ -532,7 +517,7 @@ fi
 
     stage("Deploying ${DEPLOYTAG}"){
       sh """
-ssh -tt ec2-user@18.140.71.163 /bin/bash << EOA
+ssh -tt ec2-user@3.0.102.120 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lh gateway*
 tar -xzf gateway-config.tar.gz

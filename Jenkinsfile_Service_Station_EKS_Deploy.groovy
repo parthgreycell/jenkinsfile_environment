@@ -13,10 +13,7 @@ node("built-in"){
     def repoRegion = ""
     def dockerImageWithTag = ""
     def bootstrapper = [
-      "dev": "18.140.71.163",
-      "qa": "18.140.71.163",
-      "uat": "18.140.71.163",
-      "prod": "18.140.71.163"
+      "dev": "3.0.102.120"
     ]
     stage('Preparation'){
       if (''.equals(TagName)){
@@ -57,13 +54,13 @@ node("built-in"){
         sh """
 cd BidClips-EKS/Kubernetes/application-stack/
 sed -i 's#REPLACEME_DOCKER_IMAGE_WITH_TAG#$dockerImageWithTag#g' servicestation.yaml
-scp servicestation.yaml ec2-user@18.140.71.163:/home/ec2-user/servicestation.yaml
+scp servicestation.yaml ec2-user@3.0.102.120:/home/ec2-user/servicestation.yaml
         """
       }
     }
     stage("Deploying ${DEPLOYTAG}"){
       sh """
-ssh -tt ec2-user@18.140.71.163 /bin/bash << EOA
+ssh -tt ec2-user@3.0.102.120 /bin/bash << EOA
 export AWS_DEFAULT_REGION="${repoRegion}"
 ls -lh servicestation.yaml
 kubectl -f servicestation.yaml
